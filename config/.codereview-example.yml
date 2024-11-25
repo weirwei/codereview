@@ -1,0 +1,28 @@
+languages: # 启用 code review 的语言，目前只支持 go
+  - go
+
+code:
+  git:
+    review_branch: HEAD # 代码review的分支，默认为当前分支
+    compare_branch: origin/master # 对比的分支，默认为 origin/master
+  files:
+    ignore: # 忽略的文件
+      - .*_test.go
+      - .*_mock.go
+      - docs/doc.go
+
+# 知识库。自定义
+knowledge:
+  enable: true
+  tree_standard:
+    api: 
+      - 封装请求依赖方的api
+      - 不应该有复杂的业务逻辑
+  custom:
+    go:
+      - regexp: goroutine\.NewMulti # 匹配对应的代码片段
+        rules:
+          - goroutine.NewMulti() 返回的对象必须调用 Wait() 函数
+      - regexp: \\.(.+)
+        rules:
+          - 类型断言的时候需要使用 ", ok" 来检查结果。
