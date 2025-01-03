@@ -1,5 +1,4 @@
-languages: # 启用 code review 的语言，目前只支持 go
-  - go
+language: go
 
 code:
   git:

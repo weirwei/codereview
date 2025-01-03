@@ -1,4 +1,4 @@
-package cmd
+package llm
 
 import (
 	"fmt"
@@ -74,12 +74,10 @@ ${TEMPLATE}
 
 `
 var treeStandard = map[string][]string{
-	"/data": {
-		"模块化功能封装",
-		"具有通用性",
-	},
-	"/api": {
-		"api访问目录",
+	"/cmd": {
+		"目录下的每个子目录都应该对应一个独立的可执行程序",
+		"子目录名应该与生成的程序名一致",
+		"避免放置大量业务逻辑代码",
 	},
 }
 

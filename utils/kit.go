@@ -1,27 +1,29 @@
-package cmd
+package utils
 
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"unicode"
 
+	"github.com/weirwei/codereview/log"
 	"golang.org/x/net/html"
 )
 
-// ShellExec Exec Shell Command
-func ShellExec(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
-	Debugf("command exec:%s", cmd.String())
-	result, err := cmd.CombinedOutput()
+// WriteFile
+func WriteFile(content, fileName string) {
+	file, err := os.Create(fileName)
 	if err != nil {
-		Errorf("Shell Exec failed: command: %s, err: %s, output: %s", cmd.String(), err.Error(), result)
-		return "", err
+		log.Errorf("Failed to create file:%v", err)
+		return
 	}
-	Debugf("command exec result:%s", strings.ReplaceAll(string(result), "\n", "\\n"))
-	return string(result), err
+	defer file.Close()
+	_, err = file.WriteString(content)
+	if err != nil {
+		log.Errorf("Failed to write file:", err)
+		return
+	}
 }
 
 // MatchFileLanguage Match code language based on file extension
@@ -31,21 +33,6 @@ func MatchFileLanguage(fileName string) string {
 		return "go"
 	default:
 		return ""
-	}
-}
-
-// WriteFile
-func WriteFile(content, fileName string) {
-	file, err := os.Create(fileName)
-	if err != nil {
-		Errorf("Failed to create file:%v", err)
-		return
-	}
-	defer file.Close()
-	_, err = file.WriteString(content)
-	if err != nil {
-		Errorf("Failed to write file:", err)
-		return
 	}
 }
 
@@ -130,4 +117,38 @@ func ToJson(obj interface{}) string {
 		return ""
 	}
 	return string(data)
+}
+
+func GetLangByFilepath(filepath string) string {
+	ext := strings.ToLower(strings.TrimPrefix(filepath[strings.LastIndex(filepath, "."):], "."))
+	switch ext {
+	case "go":
+		return "go"
+	case "py", "python":
+		return "python"
+	case "js", "jsx":
+		return "javascript"
+	case "ts", "tsx":
+		return "typescript"
+	case "java":
+		return "java"
+	case "c":
+		return "c"
+	case "cpp", "cc", "cxx":
+		return "cpp"
+	case "cs":
+		return "csharp"
+	case "rb":
+		return "ruby"
+	case "php":
+		return "php"
+	case "swift":
+		return "swift"
+	case "kt":
+		return "kotlin"
+	case "rs":
+		return "rust"
+	default:
+		return ""
+	}
 }

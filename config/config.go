@@ -1,61 +1,27 @@
 package config
 
 import (
-	"os"
-
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
+	"regexp"
 )
 
-type Config struct {
-	Languages []string  `yaml:"languages"`
-	Code      Code      `yaml:"code"`
-	Knowledge Knowledge `yaml:"knowledge"`
-}
+const (
+	LANGUAGES = "languages"
+
+	CODE_GIT_REVIEW_BRANCH  = "code.git.review_branch"
+	CODE_GIT_COMPARE_BRANCH = "code.git.compare_branch"
+
+	CODE_FILES_IGNORE = "code.files.ignore"
+
+	KNOWLEDGE = "knowledge"
+)
 
 type CustomRule struct {
-	Regexp string   `yaml:"regexp"`
-	Rules  []string `yaml:"rules"`
-}
-type Code struct {
-	Git   Git   `yaml:"git"`
-	Files Files `yaml:"files"`
-}
-type Files struct {
-	Ignore []string `yaml:"ignore"`
-}
-
-type Git struct {
-	ReviewBranch  string `yaml:"review_branch"`
-	CompareBranch string `yaml:"compare_branch"`
+	Regexp  string        `yaml:"regexp" json:"regexp"`
+	RegexpF regexp.Regexp `yaml:"-" json:"-"`
+	Rules   []string      `yaml:"rules" json:"rules"`
 }
 
 type Knowledge struct {
 	Custom       map[string][]CustomRule `yaml:"custom"`
 	TreeStandard map[string][]string     `yaml:"tree_standard"`
-}
-
-var CRConf Config
-
-func LoadConfig() {
-	// read config
-	yamlFile, err := os.ReadFile(".codereview.yaml")
-	if err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			panic(err)
-		}
-	} else {
-		// unmarshal YAML to config
-		err = yaml.Unmarshal(yamlFile, &CRConf)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	if len(CRConf.Code.Git.ReviewBranch) == 0 {
-		CRConf.Code.Git.ReviewBranch = "HEAD"
-	}
-	if len(CRConf.Code.Git.CompareBranch) == 0 {
-		CRConf.Code.Git.CompareBranch = "origin/master"
-	}
 }
