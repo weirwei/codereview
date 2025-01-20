@@ -50,11 +50,6 @@ var (
 	regexpM   = map[string]*regexp.Regexp{}
 )
 
-func init() {
-	flagParse()
-
-}
-
 func flagParse() {
 	rootCmd.PersistentFlags().StringP("output", "o", "", "output filename")
 	rootCmd.PersistentFlags().StringP("pkg", "p", "", "review package, split with ','.")
@@ -77,6 +72,7 @@ func initConfig() {
 	// Search config in home directory with name ".cobra" (without extension).
 	userViper.AddConfigPath(home)
 	userViper.SetConfigName(".codereview")
+	userViper.SetConfigType("ini")
 	if err := userViper.ReadInConfig(); err != nil {
 		if errors.As(err, &viper.ConfigFileNotFoundError{}) {
 			// 文件没找到
@@ -106,6 +102,7 @@ func createConfig() {
 	sk, _ := reader.ReadString('\n')
 	fmt.Print("Please input your llm model name: ")
 	model, _ := reader.ReadString('\n')
+
 	fmt.Print("Please input max token(default 4096): ")
 enterMaxToken:
 	maxToken, _ := reader.ReadString('\n')
@@ -165,8 +162,12 @@ func exec() {
 	for _, v := range ignore {
 		filepathFilters = append(filepathFilters, *regexp.MustCompile(v))
 	}
+	var pkgs []string
+	if len(pkg) > 0 {
+		pkgs = strings.Split(pkg, ",")
+	}
 	codePatch, err := code.NewGit(code.GitCond{
-		Pkgs:            strings.Split(pkg, ","),
+		Pkgs:            pkgs,
 		ReviewBranch:    reviewBranch,
 		CompareBranch:   compareBranch,
 		MaxToken:        maxToken,

@@ -33,10 +33,10 @@ func (r *implLLM) SetCodePatch(codePatch code.CodePatch) {
 }
 
 func NewDefaultReviewer(ctx context.Context, baseUrl, sk, model string, maxToken int, language string) *implLLM {
-	return newReviewer(ctx, code.CodePatch{}, language, llm.PromptConfig{}, maxToken, model, sk, baseUrl, nil)
+	return newReviewer(ctx, code.CodePatch{}, language, maxToken, model, sk, baseUrl, nil)
 }
 
-func newReviewer(ctx context.Context, codePatch code.CodePatch, language string, rules llm.PromptConfig, maxToken int, model string, sk string, baseUrl string, handler func(context.Context, string) error) *implLLM {
+func newReviewer(ctx context.Context, codePatch code.CodePatch, language string, maxToken int, model string, sk string, baseUrl string, handler func(context.Context, string) error) *implLLM {
 	return &implLLM{
 		ctx:       ctx,
 		codePatch: codePatch,
