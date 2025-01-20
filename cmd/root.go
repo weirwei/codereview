@@ -78,7 +78,7 @@ func initConfig() {
 			cobra.CheckErr(err)
 		}
 	}
-
+	setLogLevel()
 	projViper.SetConfigName(".codereview")
 	projViper.SetConfigType("yaml")
 	projViper.AddConfigPath("./")
@@ -86,6 +86,25 @@ func initConfig() {
 		if !errors.As(err, &viper.ConfigFileNotFoundError{}) {
 			cobra.CheckErr(err)
 		}
+	}
+}
+
+func setLogLevel() {
+	switch strings.ToUpper(userViper.GetString("log.level")) {
+	case "DEBUG":
+		log.SetLevel(log.LevelDebug)
+	case "INFO":
+		log.SetLevel(log.LevelInfo)
+	case "WARN":
+		log.SetLevel(log.LevelWarn)
+	case "ERROR":
+		log.SetLevel(log.LevelError)
+	case "FATAL":
+		log.SetLevel(log.LevelFatal)
+	case "PANIC":
+		log.SetLevel(log.LevelPanic)
+	default:
+		log.SetLevel(log.LevelInfo)
 	}
 }
 

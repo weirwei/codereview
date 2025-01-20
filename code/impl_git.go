@@ -102,10 +102,10 @@ func (i *implGit) getFilepath() ([]string, error) {
 		filepathFilters = i.filepathFilters
 	)
 
-	// _, err := utils.ShellExec("git", "fetch")
-	// if err != nil {
-	// 	return nil, err
-	// }
+	_, err := utils.ShellExec("git", "fetch")
+	if err != nil {
+		return nil, err
+	}
 	args := []string{
 		"diff",
 		fmt.Sprintf("%s...%s", reviewBranch, compareBranch),
