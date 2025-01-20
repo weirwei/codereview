@@ -39,22 +39,17 @@ func Execute() error {
 }
 
 var (
-	output  string // output: file name
+	// output  string // output: file name
 	pkg     string // pkg: review dir
-	model   string // model: llm model
-	debug   bool   // debug: debug mode
 	version bool   // version: print version
 
 	userViper = viper.New()
 	projViper = viper.New()
-	regexpM   = map[string]*regexp.Regexp{}
 )
 
 func flagParse() {
-	rootCmd.PersistentFlags().StringP("output", "o", "", "output filename")
+	// rootCmd.PersistentFlags().StringP("output", "o", "", "output filename")
 	rootCmd.PersistentFlags().StringP("pkg", "p", "", "review package, split with ','.")
-	rootCmd.PersistentFlags().StringP("model", "m", "claude-3-5-sonnet-20240620", "specified model")
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "debug mode")
 	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "version")
 	viper.BindPFlag("llm.model", rootCmd.PersistentFlags().Lookup("model"))
 }
@@ -90,6 +85,14 @@ func initConfig() {
 	if err := projViper.ReadInConfig(); err != nil {
 		if !errors.As(err, &viper.ConfigFileNotFoundError{}) {
 			cobra.CheckErr(err)
+		}
+	}
+}
+
+func setRegexpF(knowledge *config.Knowledge) {
+	for _, rules := range knowledge.Custom {
+		for i, rule := range rules {
+			rules[i].RegexpF = regexp.MustCompile(rule.Regexp)
 		}
 	}
 }
@@ -158,6 +161,8 @@ func exec() {
 	if err := decoder.Decode(data); err != nil {
 		cobra.CheckErr(err)
 	}
+	// set regexp from regexp
+	setRegexpF(&knowledge)
 	var filepathFilters []regexp.Regexp
 	for _, v := range ignore {
 		filepathFilters = append(filepathFilters, *regexp.MustCompile(v))

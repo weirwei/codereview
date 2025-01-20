@@ -2,54 +2,58 @@ package review
 
 import (
 	"context"
+	"fmt"
 	"strings"
 )
 
 type Handler func(ctx context.Context, data string) error
 
+// todo tag explain
 var (
 	beginTag = `<output>`
 	endTag   = `</output>`
 )
 
 func GetDefaultHandler(send func(data string)) Handler {
-	var (
-		cache string
+	// var (
+	// 	cache string
 
-		parseBegin bool
-		parseEnd   bool
-	)
+	// 	parseBegin bool
+	// 	parseEnd   bool
+	// )
 	return func(ctx context.Context, data string) error {
-		var result string
-		if parseBegin && parseEnd {
-			return nil
-		}
-		cache += data
-		if !parseBegin {
-			if strings.Contains(cache, beginTag) {
-				parseBegin = true
-				start := strings.Index(cache, beginTag) + len(beginTag)
-				end := len(cache)
-				if strings.Contains(cache, endTag) {
-					parseEnd = true
-					end = strings.Index(cache, endTag)
-				}
-				result = cache[start:end]
-				send(result)
-				cache = ""
-			}
-		} else {
-			if strings.Contains(cache, endTag) {
-				parseEnd = true
-				result = cache[:strings.Index(cache, endTag)]
-				cache = ""
-			} else if hasOverlapEfficient(cache, endTag) {
-				// has overlap, keep cache
-			} else {
-				send(result)
-				cache = ""
-			}
-		}
+		fmt.Print(data)
+		// 	var result string
+		// 	if parseBegin && parseEnd {
+		// 		return nil
+		// 	}
+		// 	cache += data
+		// 	if !parseBegin {
+		// 		if strings.Contains(cache, beginTag) {
+		// 			parseBegin = true
+		// 			start := strings.Index(cache, beginTag) + len(beginTag)
+		// 			end := len(cache)
+		// 			if strings.Contains(cache, endTag) {
+		// 				parseEnd = true
+		// 				end = strings.Index(cache, endTag)
+		// 			}
+		// 			result = cache[start:end]
+		// 			send(result)
+		// 			cache = ""
+		// 		}
+		// 	} else {
+		// 		if strings.Contains(cache, endTag) {
+		// 			parseEnd = true
+		// 			result = cache[:strings.Index(cache, endTag)]
+		// 			send(result)
+		// 			cache = ""
+		// 		} else if hasOverlapEfficient(cache, endTag) {
+		// 			// has overlap, keep cache
+		// 		} else {
+		// 			send(result)
+		// 			cache = ""
+		// 		}
+		// 	}
 		return nil
 	}
 }

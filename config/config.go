@@ -16,9 +16,9 @@ const (
 )
 
 type CustomRule struct {
-	Regexp  string        `yaml:"regexp" json:"regexp"`
-	RegexpF regexp.Regexp `yaml:"-" json:"-"`
-	Rules   []string      `yaml:"rules" json:"rules"`
+	Regexp  string         `yaml:"regexp" json:"regexp"`
+	RegexpF *regexp.Regexp `yaml:"-" json:"-"`
+	Rules   []string       `yaml:"rules" json:"rules"`
 }
 
 type Knowledge struct {

@@ -7,7 +7,6 @@ import (
 	"io"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/spf13/viper"
 	"github.com/weirwei/codereview/code"
 	"github.com/weirwei/codereview/llm"
 	"github.com/weirwei/codereview/log"
@@ -71,7 +70,7 @@ func (r *implLLM) Exec() error {
 		return err
 	}
 	config := openai.DefaultConfig(r.sk)
-	config.BaseURL = viper.GetString(r.baseUrl)
+	config.BaseURL = r.baseUrl
 	stream, err := llm.CreateChatCompletionStream(r.ctx, config, openai.ChatCompletionRequest{
 		Model: r.model,
 		Messages: []openai.ChatCompletionMessage{
