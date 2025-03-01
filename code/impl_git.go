@@ -81,11 +81,10 @@ func (i *implGit) GetCode() ([]CodePatch, error) {
 		if contentToken+promptToken > maxToken {
 			codePatch = append(codePatch, cp)
 			cp = CodePatch{}
-		} else {
-			cp.Content += contentItem + "\n"
-			cp.MatchRules = rules
-			cp.Filepaths = append(cp.Filepaths, v)
 		}
+		cp.Content += contentItem + "\n"
+		cp.MatchRules = rules
+		cp.Filepaths = append(cp.Filepaths, v)
 	}
 	if len(cp.Content) > 0 {
 		codePatch = append(codePatch, cp)
