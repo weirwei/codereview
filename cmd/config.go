@@ -53,6 +53,26 @@ var getCmd = &cobra.Command{
 	},
 }
 
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all configuration values",
+	Run: func(cmd *cobra.Command, args []string) {
+		allSettings := userViper.AllSettings()
+		for key, value := range allSettings {
+			switch v := value.(type) {
+			case string:
+				fmt.Printf("%s=%v\n", key, v)
+			case map[string]interface{}:
+				for subKey, subValue := range v {
+					fmt.Printf("%s.%s=%v\n", key, subKey, subValue)
+				}
+			default:
+				fmt.Printf("%s=%v\n", key, v)
+			}
+		}
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(configCmd)
 	// viper.SetConfigType("ini")
@@ -66,7 +86,7 @@ func init() {
 	// 		return
 	// 	}
 	// }
-	configCmd.AddCommand(setCmd, getCmd)
+	configCmd.AddCommand(setCmd, getCmd, listCmd)
 }
 
 func GetUserHomeDir() string {
