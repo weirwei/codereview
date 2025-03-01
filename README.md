@@ -39,7 +39,7 @@ func Atoi(s string) int {
 使用以下命令安装 `codereview`：
 
 ```bash
-go install  
+go install github.com/weirwei/codereview@latest
 ```
 
 ## 使用
@@ -52,15 +52,66 @@ go install
 codereview  
 ```
 
-### Options
+### 可用命令
 
-- `-h` 或 `--help`: 显示帮助信息
-- `-o`: 指定输出的文件，如：`codereview -o result.md`
-- `-p`: 指定审查的 `package`，可批量，用 `,` 分割。如：`codereview -p controller/common,codereview/reviewexample`
-- `-m`: 指定模型。
-- `-d`: debug 模式。感觉结果不太对劲的时候可以加上看看日志。
+`codereview` 提供了以下主要命令：
 
-## 配置
+1. 主命令：
+   - `codereview`: 执行代码审查。
+     选项：
+     - `--pkg`, `-p`: 指定要审查的包，可以用逗号分隔多个包。
+     - `--version`, `-v`: 显示版本信息。
+     - `--debug`, `-d`: 设置日志级别为 DEBUG。
+
+
+2. 配置命令：
+   - `codereview config`: 管理配置
+     - `set <key> <value>`: 设置配置项
+     - `get <key>`: 获取配置项的值
+     - `list`: 列出所有配置项
+
+3. 版本命令：
+   - `codereview version`: 显示 CodeReview 的版本号
+
+### 命令示例
+
+1. 执行代码审查：
+   ```bash
+   codereview
+   ```
+
+2. 审查特定包：
+   ```bash
+   codereview -p package1,package2
+   ```
+
+3. 以调试模式运行：
+   ```bash
+   codereview -d
+   ```
+   或
+   ```bash
+   codereview --debug
+   ```
+
+4. 显示版本信息：
+   ```bash
+   codereview -v
+   ```
+   或
+   ```bash
+   codereview version
+   ```
+
+4. 配置管理：
+   ```bash
+   codereview config set model gpt-3.5-turbo
+   codereview config get model
+   codereview config list
+   ```
+
+
+## 配置文件
 
 在项目根目录下创建 `.codereview.yml` 文件。无配置情况下，会根据默认配置运行程序。
 
@@ -125,29 +176,4 @@ knowledge:
 | tree_standard | 目录树检查的 `knowledge`，kv 形式 | k 为对应的 `文件路径`，v 为配置内容，`array-string` 类型。 |
 
 ## ToDo
-
-1. ~~Debug 模式，优化报错提示；~~
-2. ~~规范分级；~~
-3. ~~目录树检查；~~
-4. 补充通用规范；
-5. 优化输出效果，减少无意义的建议；
-6. 支持大文件 `review`，大文件拆函数；
-7. 支持参与到 `CI/CD` 流程中；
-8. review 指定某个文件；
-9. review 未提交文件；
-
-## BUGS
-1. ~~删除的文件运行 git diff 会报错~~
-2. ~~gptserver 报错优化，目前报错会当做空接口，直接 LGTM~~ 现在会提示 “llm 结果为空”
-   
-
-## 模型测评
-
-- o1-preview: 效果还行。速度慢。并且因为不支持流，请求ptserver可能造成504超时
-- o1-mini: 无意义输出太多。速度慢
-- gpt-4o-mini: 效果还行，可能会无法联系所有内容。速度很快
-- gpt-4o: 效果不错。速度快
-- glm-4v: 输出没法看。速度快
-- glm-4-flash: 无意义输出太多。速度快
-- Ernie-4.0-8K: 效果还行，但是输出格式不正确。速度中等
-- Ernie-3.5-8K: 效果差。速度慢
+1. 支持加入 ci/cd 流程;

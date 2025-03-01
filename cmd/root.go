@@ -42,6 +42,7 @@ var (
 	// output  string // output: file name
 	pkg     string // pkg: review dir
 	version bool   // version: print version
+	debug   bool   // debug: set log level to DEBUG
 
 	userViper = viper.New()
 	projViper = viper.New()
@@ -51,12 +52,13 @@ func flagParse() {
 	// rootCmd.PersistentFlags().StringP("output", "o", "", "output filename")
 	rootCmd.PersistentFlags().StringP("pkg", "p", "", "review package, split with ','.")
 	rootCmd.PersistentFlags().BoolVarP(&version, "version", "v", false, "version")
-	viper.BindPFlag("llm.model", rootCmd.PersistentFlags().Lookup("model"))
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "set log level to DEBUG")
+	// viper.BindPFlag("llm.model", rootCmd.PersistentFlags().Lookup("model"))
 }
 
 func init() {
-	initConfig()
-	cobra.OnInitialize(flagParse)
+	flagParse()
+	cobra.OnInitialize(initConfig)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -83,13 +85,17 @@ func initConfig() {
 	projViper.SetConfigType("yaml")
 	projViper.AddConfigPath("./")
 	if err := projViper.ReadInConfig(); err != nil {
-		if !errors.As(err, &viper.ConfigFileNotFoundError{}) {
+		if !errors.As(err, &viper.ConfigFileNotFoundError{}) && !errors.As(err, &viper.ConfigParseError{}) {
 			cobra.CheckErr(err)
 		}
 	}
 }
 
 func setLogLevel() {
+	if debug {
+		log.SetLevel(log.LevelDebug)
+		return
+	}
 	switch strings.ToUpper(userViper.GetString("log.level")) {
 	case "DEBUG":
 		log.SetLevel(log.LevelDebug)
@@ -125,11 +131,11 @@ func createConfig() {
 	fmt.Print("Please input your llm model name: ")
 	model, _ := reader.ReadString('\n')
 
-	fmt.Print("Please input max token(default 4096): ")
+	fmt.Print("Please input max token(default 8192): ")
 enterMaxToken:
 	maxToken, _ := reader.ReadString('\n')
 	if len(maxToken) == 0 {
-		maxToken = "4096"
+		maxToken = "8192"
 	}
 	maxTokenInt, err := strconv.ParseInt(maxToken, 10, 64)
 	if err != nil {
@@ -162,7 +168,7 @@ func exec() {
 		model    = userViper.GetString("llm.model")
 		maxToken = userViper.GetInt("llm.max_token")
 
-		language      = projViper.GetString("language")
+		language      = projViper.GetString("language") // todo: different language custom prompt
 		reviewBranch  = projViper.GetString(config.CODE_GIT_REVIEW_BRANCH)
 		compareBranch = projViper.GetString(config.CODE_GIT_COMPARE_BRANCH)
 		ignore        = projViper.GetStringSlice(config.CODE_FILES_IGNORE)

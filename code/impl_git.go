@@ -78,6 +78,7 @@ func (i *implGit) GetCode() ([]CodePatch, error) {
 		rules := getMatchRules(v, content)
 		contentToken := utils.EstimateTokens(content)
 		promptToken := utils.EstimateTokens(utils.ToJson(rules))
+		// Over maxToken.Add to codePatch and reset cp
 		if contentToken+promptToken > maxToken {
 			codePatch = append(codePatch, cp)
 			cp = CodePatch{}
